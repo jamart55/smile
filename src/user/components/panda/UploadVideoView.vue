@@ -48,11 +48,14 @@ onMounted(() => {
 
       <template #right>
         <div class="border border-border text-left bg-muted p-6 rounded-lg">
-          <div class="aspect-video bg-background rounded-md flex items-center justify-center mb-4">
-            <p class="text-muted-foreground text-center p-4">
-              Instructional video placeholder — replace with your video URL using a
-              <code>&lt;video&gt;</code> or <code>&lt;iframe&gt;</code> element.
-            </p>
+          <div class="aspect-video bg-background rounded-md overflow-hidden mb-4">
+            <video
+              :src="api.getPublicUrl('videos/debrief/upload-vid.mp4')"
+              class="w-full h-full object-contain"
+              controls
+              autoplay
+              playsinline
+            />
           </div>
           <p class="text-sm text-muted-foreground">
             If you have any questions about uploading your video, please contact the research team.

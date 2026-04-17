@@ -1,277 +1,162 @@
 /**
  * @file design.js
- * @description Configures the overall logic and timeline of the experiment.
- * The timeline defines the sequence of phases that the experiment goes through.
- * This file configures which phases occur in what order.
- *
- * Key documentation:
- * - Views: https://smile.gureckislab.org/views.html
- * - Timeline: https://smile.gureckislab.org/timeline.html
- * - Randomization: https://smile.gureckislab.org/randomization.html
- *
- * @module design
+ * @description Disjunctive Syllogism Pilot — SMILE + PANDA
+ * Eye-tracking study for children with video stimuli.
  */
 
-import { markRaw } from 'vue'
 import { processQuery, initService } from '@/core/utils/utils'
 
-// 1. Import main built-in View components
+// Built-in views
 import AdvertisementView from '@/builtins/advertisement/AdvertisementView.vue'
-import MTurkRecruitView from '@/builtins/mturk/MTurkRecruitView.vue'
-import InformedConsentView from '@/builtins/informedConsent/InformedConsentView.vue'
-import DemographicSurveyView from '@/builtins/demographicSurvey/DemographicSurveyView.vue'
-import DeviceSurveyView from '@/builtins/deviceSurvey/DeviceSurveyView.vue'
-import InstructionsView from '@/builtins/instructions/InstructionsView.vue'
-import InstructionsQuizView from '@/builtins/instructionsQuiz/InstructionsQuiz.vue'
-import DebriefView from '@/builtins/debrief/DebriefView.vue'
-import TaskFeedbackSurveyView from '@/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue'
 import ThanksView from '@/builtins/thanks/ThanksView.vue'
 import WithdrawView from '@/builtins/withdraw/WithdrawView.vue'
-import WindowSizerView from '@/builtins/windowSizer/WindowSizerView.vue'
 
-// 2. Import user View components
-import ExpView from '@/builtins/demoTasks/ExpView.vue'
-import FavoriteNumber from '@/builtins/demoTasks/FavoriteNumber.vue'
-import FavoriteColor from '@/builtins/demoTasks/FavoriteColor.vue'
-import StroopExpView from '@/user/components/stroop_exp/StroopExpView.vue'
+// Study views
+import IntroView from '@/user/components/IntroView.vue'
+import SoundcheckView from '@/user/components/SoundcheckView.vue'
+import ConsentView from '@/user/components/ConsentView.vue'
+import SetupView from '@/user/components/SetupView.vue'
+import EnterFullscreenView from '@/user/components/EnterFullscreenView.vue'
+import TrialView from '@/user/components/TrialView.vue'
+import DebriefIntroView from '@/user/components/DebriefIntroView.vue'
+import DebriefDemoView from '@/user/components/DebriefDemoView.vue'
+import DebriefTechView from '@/user/components/DebriefTechView.vue'
 
-// #3. Import smile API and timeline
+// PANDA views
+import ParentFormView from '@/user/components/panda/ParentFormView.vue'
+import UploadVideoView from '@/user/components/panda/UploadVideoView.vue'
+
+// API and Timeline
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 import Timeline from '@/core/timeline/Timeline'
 const timeline = new Timeline(api)
 
-// #4.  Set runtime configuration options
-//      See http://smile.gureckislab.org/configuration.html#experiment-options-env
+// Runtime configuration
 api.setRuntimeConfig('allowRepeats', false)
-
 api.setRuntimeConfig('colorMode', 'light')
 api.setRuntimeConfig('responsiveUI', true)
-
 api.setRuntimeConfig('windowsizerRequest', { width: 800, height: 600 })
-api.setRuntimeConfig('windowsizerAggressive', true)
-
+api.setRuntimeConfig('windowsizerAggressive', false)
 api.setRuntimeConfig('anonymousMode', false)
 api.setRuntimeConfig('labURL', 'https://gureckislab.org')
 api.setRuntimeConfig('brandLogoFn', 'universitylogo.png')
-
 api.setRuntimeConfig('maxWrites', 1000)
 api.setRuntimeConfig('minWriteInterval', 2000)
 api.setRuntimeConfig('autoSave', true)
 
-api.setRuntimeConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
+// ─── Timeline ───────────────────────────────────────────────
 
-// get rid of these two?
-api.setRuntimeConfig('estimated_time', '30-40 minutes')
-api.setRuntimeConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
-
-// set the informed consent text on the menu bar
-import InformedConsentText from './components/InformedConsentText.vue'
-api.setAppComponent('informed_consent_text', InformedConsentText)
-
-// #5. Add between-subjects condition assignment
-// This is where you can define conditions to which each participant should be assigned
-
-// You can assign conditions by passing a javascript object to api.randomAssignCondition(),
-// where the key is the condition name and the value is an array of possible condition values.
-// Each unique condition manipulation should be assigned via a separate call to setConditions.
-
-// EXAMPLE: set a between-subjects condition called taskOrder (AB or BA)
-// api.randomAssignCondition({
-//   taskOrder: ['AB', 'BA'],
-// })
-
-// you can also optionally set randomization weights for each condition. For
-// example, if you want twice as many participants to be assigned to instructions
-// version 1 compared to versions 2 and 3, you can set the weights as follows:
-api.randomAssignCondition({
-  instructionsVersion: ['1', '2', '3'],
-  weights: [2, 1, 1], // weights are automatically normalized, so [4, 2, 2] would be the same
-})
-
-// #6. Define and add some routes to the timeline
-// Each route should map to a View component.
-// Each needs a name
-// but for most experiments they go in sequence from the begining
-// to the end of this list
-
-// by default routes have meta.requiresConsent = true (unless you manually override it)
-// by default routes have meta.requiresDone = false (unless you manually override it)
-
-// IMPORTANT: A least one route needs to be called 'welcome_anonymous'
-// to handle the landing case for someone not coming from a recruitment service
-
-// First welcome screen for non-referral
+// Welcome (anonymous)
 timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome_anonymous',
   component: AdvertisementView,
   meta: {
     prev: undefined,
-    next: 'consent',
+    next: 'intro',
     allowAlways: true,
     requiresConsent: false,
-  }, // override what is next
-  beforeEnter: (to) => {
+  },
+  beforeEnter: () => {
     api.getBrowserFingerprint()
   },
 })
 
-// welcome screen for referral from a service (e.g., prolific)
+// Welcome (referred from recruitment service)
 timeline.pushSeqView({
   path: '/welcome/:service',
   name: 'welcome_referred',
   component: AdvertisementView,
   meta: {
     prev: undefined,
-    next: 'consent',
+    next: 'intro',
     allowAlways: true,
     requiresConsent: false,
   },
   beforeEnter: (to) => {
-    // handle any service-specific initialization before processing URL params
     if (initService(to.params.service) === false) return false
-    // processes info to get the service-specific
-    // participant info (e.g., Profilic ID)
     processQuery(to.query, to.params.service)
     api.getBrowserFingerprint()
   },
 })
 
-// this is a the special page that loads in the iframe on mturk.com
-timeline.registerView({
-  name: 'mturk',
-  component: MTurkRecruitView,
-  props: {
-    estimated_time: api.getConfig('estimated_time'),
-    payrate: api.getConfig('payrate'),
-  },
-  meta: { allowAlways: true, requiresConsent: false },
-  beforeEnter: (to) => {
-    processQuery(to.query, 'mturk')
-  },
+// 1. Intro (start image + 3-items instructions)
+timeline.pushSeqView({
+  name: 'intro',
+  component: IntroView,
+  meta: { requiresConsent: false },
 })
 
-// import the consent text
-// consent
+// 2. Soundcheck
+timeline.pushSeqView({
+  name: 'soundcheck',
+  component: SoundcheckView,
+  meta: { requiresConsent: false },
+})
+
+// 3. Consent (Rachel video + after-Rachel + consent slides + signature)
 timeline.pushSeqView({
   name: 'consent',
-  component: InformedConsentView,
-  props: {
-    informedConsentText: markRaw(InformedConsentText), // provide the informed consent text
-  },
+  component: ConsentView,
   meta: {
     requiresConsent: false,
     setConsented: true,
   },
 })
 
-// demographic survey
+// 4. Setup (3 calibration videos)
 timeline.pushSeqView({
-  name: 'demograph',
-  component: DemographicSurveyView,
+  name: 'setup',
+  component: SetupView,
 })
 
-// windowsizer
+// 5. Enter fullscreen prompt
 timeline.pushSeqView({
-  name: 'windowsizer',
-  component: WindowSizerView,
+  name: 'enter_fullscreen',
+  component: EnterFullscreenView,
 })
 
-// instructions
+// 6. Trials (8 trial+attention-getter pairs in fullscreen)
 timeline.pushSeqView({
-  name: 'instructions',
-  component: InstructionsView,
+  name: 'trials',
+  component: TrialView,
 })
 
-// import the quiz questions
-import { QUIZ_QUESTIONS } from './components/quizQuestions'
-// instructions quiz
+// 7. Debrief intro video (pre-parent)
 timeline.pushSeqView({
-  name: 'quiz',
-  component: InstructionsQuizView,
-  props: {
-    questions: QUIZ_QUESTIONS,
-    returnTo: 'instructions',
-    randomizeQandA: true,
-  },
+  name: 'debrief_intro',
+  component: DebriefIntroView,
 })
 
-// main experiment
-// note: by default, the path will be set to the name of the view
-// however, you can override this by setting the path explicitly
+// 8. Child demographics
 timeline.pushSeqView({
-  name: 'exp',
-  path: '/experiment',
-  component: ExpView,
+  name: 'debrief_demo',
+  component: DebriefDemoView,
 })
 
-////// example of randomized branching routes
-// (you can also have conditional branching based on conditions -- see docs)
-
-// routes must be initially registered, to tell the timeline they exist
-timeline.registerView({
-  name: 'number',
-  component: FavoriteNumber,
-})
-
-timeline.registerView({
-  name: 'color',
-  component: FavoriteColor,
-})
-
-timeline.pushRandomizedNode({
-  name: 'RandomSplit',
-  options: [['number'], ['color']],
-})
-
-// stroop exp
+// 9. Technical questions
 timeline.pushSeqView({
-  name: 'stroop',
-  component: StroopExpView,
+  name: 'debrief_tech',
+  component: DebriefTechView,
 })
 
-// debriefing form
-import DebriefText from '@/user/components/DebriefText.vue' // get access to the global store
+// 10. PANDA parent form (privacy consent + signature)
 timeline.pushSeqView({
-  name: 'debrief',
-  component: DebriefView,
-  props: {
-    debriefText: markRaw(DebriefText),
-  },
+  name: 'parentform',
+  component: ParentFormView,
+  meta: { setDone: true },
 })
 
-// device survey
+// 11. Upload video instructions
 timeline.pushSeqView({
-  name: 'device',
-  component: DeviceSurveyView,
+  name: 'uploadvideo',
+  component: UploadVideoView,
+  meta: { resetApp: api.getConfig('allowRepeats') },
 })
 
-// debriefing form
-timeline.pushSeqView({
-  name: 'feedback',
-  component: TaskFeedbackSurveyView,
-  meta: { setDone: true }, // this is the last form
-})
-
-// --- PANDA end-of-study flow (uncomment for PANDA studies) ---
-// import ParentFormView from '@/user/components/panda/ParentFormView.vue'
-// import UploadVideoView from '@/user/components/panda/UploadVideoView.vue'
-//
-// timeline.pushSeqView({
-//   name: 'parentform',
-//   component: ParentFormView,
-//   meta: { setDone: true },
-// })
-//
-// timeline.pushSeqView({
-//   name: 'uploadvideo',
-//   component: UploadVideoView,
-//   meta: { resetApp: true },
-// })
-
-// thanks/submit page
+// 12. Thanks
 timeline.pushSeqView({
   name: 'thanks',
   component: ThanksView,
@@ -281,7 +166,7 @@ timeline.pushSeqView({
   },
 })
 
-// this is a special page that is for a withdraw
+// Withdraw page
 timeline.registerView({
   name: 'withdraw',
   meta: {
