@@ -1,12 +1,4 @@
 <script setup>
-/**
- * ConsentView — Multi-step consent flow:
- * 1. Rachel intro video
- * 2. After-Rachel video
- * 3. Consent slides 001-006 (images)
- * 4. Consent slide 007 video (signature explanation)
- * 5. Signature capture
- */
 import { ref, nextTick, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
@@ -34,22 +26,19 @@ api.steps.append([
 const videoReady = ref(false)
 
 function onVideoEnded() {
-  videoReady.value = true
+  if (api.stepData.id === 'consent-07-vid') {
+    api.goNextStep()
+  } else {
+    videoReady.value = true
+  }
 }
 
 function playVideo() {
-  if (videoEl.value) {
-    videoEl.value.play()
-  }
+  if (videoEl.value) videoEl.value.play()
 }
 
 function next() {
   videoReady.value = false
-  if (api.stepData.id === 'signature') {
-    // Save signature and finish
-    saveSignature()
-    return
-  }
   if (api.isLastStep()) {
     api.goNextView()
   } else {
@@ -95,58 +84,57 @@ function saveSignature() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex flex-col items-center justify-center h-full p-4">
+    <div class="flex flex-col h-full">
       <!-- Video steps -->
       <template v-if="api.stepData.type === 'video'">
-        <video
-          ref="videoEl"
-          :key="api.stepData.id"
-          :src="api.getPublicUrl(api.stepData.src)"
-          class="max-w-full max-h-[75%] object-contain rounded"
-          @ended="onVideoEnded"
-          @canplay="playVideo"
-          playsinline
-        />
-        <Button
-          v-if="videoReady"
-          variant="default"
-          size="lg"
-          class="mt-4"
-          @click="next"
-        >
-          Continue
-        </Button>
+        <div class="flex-1 min-h-0 flex items-center justify-center">
+          <video
+            ref="videoEl"
+            :key="api.stepData.id"
+            :src="api.getPublicUrl(api.stepData.src)"
+            class="max-w-full max-h-full object-contain"
+            @ended="onVideoEnded"
+            @canplay="playVideo"
+            playsinline
+          />
+        </div>
+        <div class="flex justify-center py-3 flex-shrink-0" style="min-height: 52px;">
+          <Button v-if="videoReady" variant="default" size="lg" @click="next">Continue</Button>
+        </div>
       </template>
 
       <!-- Image steps -->
       <template v-if="api.stepData.type === 'image'">
-        <img
-          :key="api.stepData.id"
-          :src="api.getPublicUrl(api.stepData.src)"
-          alt="Consent"
-          class="max-w-full max-h-[80%] object-contain mb-4"
-        />
-        <Button variant="default" size="lg" @click="next">Continue</Button>
+        <div class="flex-1 min-h-0 flex items-center justify-center">
+          <img
+            :key="api.stepData.id"
+            :src="api.getPublicUrl(api.stepData.src)"
+            alt="Consent"
+            class="max-w-full max-h-full object-contain"
+          />
+        </div>
+        <div class="flex justify-center py-3 flex-shrink-0">
+          <Button variant="default" size="lg" @click="next">Continue</Button>
+        </div>
       </template>
 
       <!-- Signature step -->
       <template v-if="api.stepData.type === 'signature'">
-        <h2 class="text-2xl font-bold mb-4">Please sign below to consent</h2>
-        <div class="border border-border rounded-md bg-white p-1 w-full max-w-lg">
-          <VueSignaturePad
-            ref="signaturePad"
-            width="100%"
-            height="200px"
-            :options="{ penColor: '#000' }"
-          />
+        <div class="flex-1 min-h-0 flex items-center justify-center p-4">
+          <div class="border border-border rounded-md bg-white p-1 w-full h-full">
+            <VueSignaturePad
+              ref="signaturePad"
+              width="100%"
+              height="100%"
+              :options="{ penColor: '#000' }"
+            />
+          </div>
         </div>
-        <div class="flex gap-2 mt-3">
+        <div class="flex justify-center gap-2 py-3 flex-shrink-0">
           <Button variant="outline" size="sm" @click="clearSignature">Clear</Button>
-          <Button variant="default" size="sm" @click="saveSignature">
-            Sign &amp; Continue
-          </Button>
+          <Button variant="default" size="sm" @click="saveSignature">Sign &amp; Continue</Button>
+          <span v-if="signatureSaved" class="text-xs text-green-600 self-center ml-2">Signature saved</span>
         </div>
-        <p v-if="signatureSaved" class="text-xs text-green-600 mt-1">Signature saved</p>
       </template>
     </div>
   </ConstrainedTaskWindow>

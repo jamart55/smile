@@ -1,7 +1,4 @@
 <script setup>
-/**
- * DebriefIntroView — Plays the pre-parent debrief video.
- */
 import { ref } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
@@ -12,9 +9,7 @@ const videoEl = ref(null)
 const videoEnded = ref(false)
 
 function playVideo() {
-  if (videoEl.value) {
-    videoEl.value.play()
-  }
+  if (videoEl.value) videoEl.value.play()
 }
 </script>
 
@@ -25,24 +20,22 @@ function playVideo() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex flex-col items-center justify-center h-full p-4">
-      <video
-        ref="videoEl"
-        :src="api.getPublicUrl('videos/debrief/debrief-intro.mp4')"
-        class="max-w-full max-h-[80%] object-contain rounded"
-        @ended="videoEnded = true"
-        @canplay="playVideo"
-        playsinline
-      />
-      <Button
-        v-if="videoEnded"
-        variant="default"
-        size="lg"
-        class="mt-4"
-        @click="api.goNextView()"
-      >
-        Continue
-      </Button>
+    <div class="flex flex-col h-full">
+      <div class="flex-1 min-h-0 flex items-center justify-center">
+        <video
+          ref="videoEl"
+          :src="api.getPublicUrl('videos/debrief/debrief-intro.mp4')"
+          class="max-w-full max-h-full object-contain"
+          @ended="videoEnded = true"
+          @canplay="playVideo"
+          playsinline
+        />
+      </div>
+      <div class="flex justify-center py-3 flex-shrink-0" style="min-height: 52px;">
+        <Button v-if="videoEnded" variant="default" size="lg" @click="api.goNextView()">
+          Continue
+        </Button>
+      </div>
     </div>
   </ConstrainedTaskWindow>
 </template>

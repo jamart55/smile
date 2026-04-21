@@ -1,65 +1,16 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smilestore'
 import appconfig from '@/core/config'
 import useAPI from '@/core/composables/useAPI'
-// load sub-components used in this component
-import WithdrawModal from '@/builtins/withdraw/WithdrawModal.vue'
-import InformedConsentModal from '@/builtins/informedConsent/InformedConsentModal.vue'
 import { Button } from '@/uikit/components/ui/button'
 
-const router = useRouter()
-const smilestore = useSmileStore() // get the global store
-const api = useAPI() // get the api
-const email = ref('')
+const smilestore = useSmileStore()
+const api = useAPI()
 
-/**
- * Prefills email address based on recruitment service
- * @returns {string} Email address for the current recruitment service
- */
-function prefill_email() {
-  let emailval = ''
-  if (smilestore.data.recruitmentService === 'prolific') {
-    emailval = `${smilestore.private.recruitmentInfo.prolific_id}@email.prolific.co`
-  }
-  return emailval
-}
-email.value = prefill_email()
-
-/* these just toggle interface elements so are state local to the component */
-const showconsentmodal = ref(false) // reactive
-/**
- * Toggles the consent modal visibility
- */
-function toggleConsent() {
-  showconsentmodal.value = !showconsentmodal.value // have to use .value in <script> when using ref()
-}
-
-const showwithdrawmodal = ref(false) // reactive
-/**
- * Toggles the withdraw modal visibility and updates email prefill
- */
-function toggleWithdraw() {
-  showwithdrawmodal.value = !showwithdrawmodal.value // have to use .value in <script> when using ref()
-  email.value = prefill_email() // update the value
-}
-
-const showreportissuemodal = ref(false) // reactive
-/**
- * Toggles the report issue modal visibility
- */
+const showreportissuemodal = ref(false)
 function toggleReport() {
-  showreportissuemodal.value = !showreportissuemodal.value // have to use .value in <script> when using ref()
-}
-
-/**
- * Submits the withdraw form and navigates to withdraw page
- */
-function submitWithdraw() {
-  // submit the withdraw form and jump to the thanks
-  toggleWithdraw()
-  router.push('withdraw') // should use
+  showreportissuemodal.value = !showreportissuemodal.value
 }
 </script>
 
@@ -89,23 +40,6 @@ function submitWithdraw() {
       <div class="flex justify-end ml-auto items-stretch">
         <div class="flex items-center pt-1" v-if="!appconfig.anonymousMode">
           <div class="flex gap-2">
-            <Button variant="outline" size="xs" v-if="api.store.browserPersisted.consented" @click="toggleConsent()">
-              <i-fa6-solid-magnifying-glass />
-              <span class="@[400px]:inline hidden">View consent</span>
-            </Button>
-            <Button
-              variant="danger-light"
-              size="xs"
-              v-if="
-                api.store.browserPersisted.consented &&
-                !api.store.browserPersisted.withdrawn &&
-                !api.store.browserPersisted.done
-              "
-              @click="toggleWithdraw()"
-            >
-              <i-fa6-solid-circle-xmark />
-              <span class="@[400px]:inline hidden">Withdraw</span>
-            </Button>
             <Button variant="warning-light" size="xs" @click="toggleReport()" v-if="false">
               <i-fa6-solid-hand />
               Report issue
@@ -116,15 +50,4 @@ function submitWithdraw() {
     </div>
   </div>
 
-  <!-- Modal components -->
-  <!-- Modal for viewing consent form -->
-  <InformedConsentModal :show="showconsentmodal" @toggle-consent="toggleConsent()" />
-
-  <!-- Modal for withdrawing from study -->
-  <WithdrawModal
-    :show="showwithdrawmodal"
-    :prefill-email="email"
-    @toggle-withdraw="toggleWithdraw()"
-    @submit-withdraw="submitWithdraw()"
-  />
 </template>

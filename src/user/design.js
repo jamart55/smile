@@ -7,7 +7,6 @@
 import { processQuery, initService } from '@/core/utils/utils'
 
 // Built-in views
-import AdvertisementView from '@/builtins/advertisement/AdvertisementView.vue'
 import ThanksView from '@/builtins/thanks/ThanksView.vue'
 import WithdrawView from '@/builtins/withdraw/WithdrawView.vue'
 
@@ -52,10 +51,10 @@ api.setRuntimeConfig('autoSave', true)
 timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome_anonymous',
-  component: AdvertisementView,
+  component: IntroView,
   meta: {
     prev: undefined,
-    next: 'intro',
+    next: 'soundcheck',
     allowAlways: true,
     requiresConsent: false,
   },
@@ -68,10 +67,10 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   path: '/welcome/:service',
   name: 'welcome_referred',
-  component: AdvertisementView,
+  component: IntroView,
   meta: {
     prev: undefined,
-    next: 'intro',
+    next: 'soundcheck',
     allowAlways: true,
     requiresConsent: false,
   },
@@ -80,13 +79,6 @@ timeline.pushSeqView({
     processQuery(to.query, to.params.service)
     api.getBrowserFingerprint()
   },
-})
-
-// 1. Intro (start image + 3-items instructions)
-timeline.pushSeqView({
-  name: 'intro',
-  component: IntroView,
-  meta: { requiresConsent: false },
 })
 
 // 2. Soundcheck
