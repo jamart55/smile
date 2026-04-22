@@ -16,9 +16,10 @@ import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { ConstrainedTaskWindow } from '@/uikit/layouts'
 
-import slideImg from '@/user/assets/pilot-slides.002.jpeg'
-import trialVideoSrc from '@/user/assets/01_ul_quad_car.mp4'
-import attentionVideoSrc from '@/user/assets/01_attention.mp4'
+const startImg = '/images/intro/start-img.png'
+const threeItemsImg = '/images/intro/3-items.jpeg'
+const trialVideoSrc = '/videos/trials/02_bl-quad-cup.mp4'
+const attentionVideoSrc = '/videos/trials/02_attention.mp4'
 
 const api = useViewAPI()
 
@@ -75,8 +76,11 @@ async function exitAndContinue() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex flex-col items-center justify-center h-full p-4">
-      <img :src="slideImg" alt="Pilot slide" class="max-w-full max-h-[60%] object-contain mb-6" />
+    <div class="flex flex-col items-center justify-center h-full p-4 gap-4">
+      <div class="flex gap-4 flex-1 min-h-0 items-center justify-center">
+        <img :src="startImg" alt="Start" class="max-h-full max-w-[45%] object-contain" />
+        <img :src="threeItemsImg" alt="3 items" class="max-h-full max-w-[45%] object-contain" />
+      </div>
       <Button variant="default" size="lg" @click="startFullscreenVideos">
         Enter Fullscreen &amp; Play Videos
       </Button>
