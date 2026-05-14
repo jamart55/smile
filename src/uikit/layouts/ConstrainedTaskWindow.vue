@@ -32,7 +32,7 @@ const containerClasses = computed(() => {
   const baseClasses = 'mx-auto m-2 rounded-xl select-none flex flex-col items-center justify-center'
   const variantClasses = {
     default: '',
-    ghost: 'bg-muted',
+    ghost: 'bg-muted px-8 py-5',
     game: 'bg-green-100',
     outline: 'border-1 border-muted-foreground',
   }
