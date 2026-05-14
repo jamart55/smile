@@ -49,13 +49,12 @@ const containerStyle = computed(() => {
       minHeight: props.height + 'px',
     }
   } else {
+    const ratio = props.width / props.height
     return {
-      width: '90vw',
-      height: props.height + 'px',
-      maxWidth: props.width + 'px',
-      maxHeight: props.height + 'px',
-      marginLeft: '20px',
-      marginRight: '20px',
+      width: `min(90vw, calc(85vh * ${ratio}))`,
+      height: `min(85vh, calc(90vw / ${ratio}))`,
+      marginLeft: 'auto',
+      marginRight: 'auto',
       paddingLeft: '30px',
       paddingRight: '30px',
       paddingTop: '20px',
