@@ -231,9 +231,7 @@ const effectiveDeviceHeight = computed(() => {
  * - Returns false if app is in presentation mode
  * - Returns true otherwise
  */
-const showStatusBar = computed(() => {
-  return api.currentRouteName() !== 'recruit' && api.currentRouteName() !== 'presentation_home'
-})
+const showStatusBar = computed(() => false)
 
 /**
  * Computed property that checks if the device is too small for the application
