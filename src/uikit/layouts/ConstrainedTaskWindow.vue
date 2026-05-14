@@ -51,8 +51,8 @@ const containerStyle = computed(() => {
   } else {
     const ratio = props.width / props.height
     return {
-      width: `min(96vw, calc(92vh * ${ratio}))`,
-      height: `min(92vh, calc(96vw / ${ratio}))`,
+      width: `min(90vw, calc(85vh * ${ratio}))`,
+      height: `min(85vh, calc(90vw / ${ratio}))`,
       marginLeft: 'auto',
       marginRight: 'auto',
     }
@@ -61,7 +61,7 @@ const containerStyle = computed(() => {
 </script>
 
 <template>
-  <div class="flex justify-center">
+  <div class="flex justify-center mt-5">
     <div :class="containerClasses" :style="containerStyle">
       <slot />
     </div>
