@@ -20,14 +20,14 @@ api.steps.append([
   { id: 'consent-05', type: 'image', src: 'images/consent/pilot-slides.005.jpeg' },
   { id: 'consent-06', type: 'image', src: 'images/consent/pilot-slides.006.jpeg' },
   { id: 'consent-07-vid', type: 'video', src: 'videos/intro/consent-sig-vid.mp4' },
-  { id: 'signature', type: 'signature' },
 ])
 
 const videoReady = ref(false)
+const sigVisible = ref(false)
 
 function onVideoEnded() {
   if (api.stepData.id === 'consent-07-vid') {
-    api.goNextStep()
+    sigVisible.value = true
   } else {
     videoReady.value = true
   }
@@ -98,7 +98,26 @@ function saveSignature() {
             playsinline
           />
         </div>
-        <div class="flex justify-center py-3 flex-shrink-0" style="min-height: 52px;">
+
+        <!-- Signature appears below consent-07-vid when it ends -->
+        <div v-if="sigVisible" class="flex-shrink-0 px-4 pb-3">
+          <p class="text-sm text-muted-foreground mb-2">Please sign below, then click "Sign &amp; Continue".</p>
+          <div class="border border-border rounded-md bg-white p-1 w-full">
+            <VueSignaturePad
+              ref="signaturePad"
+              width="100%"
+              height="160px"
+              :options="{ penColor: '#000' }"
+            />
+          </div>
+          <div class="flex gap-2 mt-2">
+            <Button variant="outline" size="sm" @click="clearSignature">Clear</Button>
+            <Button variant="default" size="sm" @click="saveSignature">Sign &amp; Continue</Button>
+            <span v-if="signatureSaved" class="text-xs text-green-600 self-center ml-2">Signature saved</span>
+          </div>
+        </div>
+
+        <div v-else class="flex justify-center py-3 flex-shrink-0" style="min-height: 52px;">
           <Button v-if="videoReady" variant="default" size="lg" @click="next">Continue</Button>
         </div>
       </template>
@@ -115,25 +134,6 @@ function saveSignature() {
         </div>
         <div class="flex justify-center py-3 flex-shrink-0">
           <Button variant="default" size="lg" @click="next">Continue</Button>
-        </div>
-      </template>
-
-      <!-- Signature step -->
-      <template v-if="api.stepData.type === 'signature'">
-        <div class="flex-1 min-h-0 flex items-center justify-center p-4">
-          <div class="border border-border rounded-md bg-white p-1 w-full h-full">
-            <VueSignaturePad
-              ref="signaturePad"
-              width="100%"
-              height="100%"
-              :options="{ penColor: '#000' }"
-            />
-          </div>
-        </div>
-        <div class="flex justify-center gap-2 py-3 flex-shrink-0">
-          <Button variant="outline" size="sm" @click="clearSignature">Clear</Button>
-          <Button variant="default" size="sm" @click="saveSignature">Sign &amp; Continue</Button>
-          <span v-if="signatureSaved" class="text-xs text-green-600 self-center ml-2">Signature saved</span>
         </div>
       </template>
     </div>

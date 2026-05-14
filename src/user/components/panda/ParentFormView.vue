@@ -105,7 +105,7 @@ function finish() {
           <label class="block text-md font-semibold text-foreground mb-3">
             Digital Signature <span class="text-red-500">*</span>
           </label>
-          <p class="text-sm text-muted-foreground mb-3">Please sign below to confirm your consent.</p>
+          <p class="text-sm text-muted-foreground mb-3">Please sign in the box below, then click "Save Signature" to confirm.</p>
           <div class="border border-border rounded-md bg-background p-1">
             <VueSignaturePad ref="signaturePad" width="100%" height="90px" :options="{ penColor: '#000' }" />
           </div>
