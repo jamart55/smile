@@ -89,7 +89,7 @@ function onVideoEnded() {
 </script>
 
 <template>
-  <div class="fixed inset-0 bg-black flex items-center justify-center z-50">
+  <div class="fixed inset-0 bg-white flex items-center justify-center z-50">
     <video
       ref="videoEl"
       :key="api.stepData.id + '-' + phase"

@@ -7,7 +7,6 @@
 import { processQuery, initService } from '@/core/utils/utils'
 
 // Built-in views
-import ThanksView from '@/builtins/thanks/ThanksView.vue'
 import WithdrawView from '@/builtins/withdraw/WithdrawView.vue'
 
 // Study views
@@ -145,18 +144,9 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'uploadvideo',
   component: UploadVideoView,
-  meta: { resetApp: api.getConfig('allowRepeats') },
+  meta: { setDone: true, resetApp: api.getConfig('allowRepeats') },
 })
 
-// 12. Thanks
-timeline.pushSeqView({
-  name: 'thanks',
-  component: ThanksView,
-  meta: {
-    requiresDone: true,
-    resetApp: api.getConfig('allowRepeats'),
-  },
-})
 
 // Withdraw page
 timeline.registerView({

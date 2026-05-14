@@ -24,7 +24,7 @@ const props = defineProps({
 })
 
 const containerClasses = computed(() => {
-  const baseClasses = 'mx-auto select-none flex flex-col items-center mt-5 mb-10'
+  const baseClasses = 'select-none flex flex-col'
 
   return [baseClasses, props.class].filter(Boolean).join(' ')
 })
@@ -38,11 +38,12 @@ const containerStyle = computed(() => {
       minHeight: props.height + 'px',
     }
   } else {
+    const ratio = props.width / props.height
     return {
-      width: '90vw',
-      minHeight: props.height + 'px',
-      maxWidth: props.width + 'px',
-      maxHeight: props.height + 'px',
+      width: `min(90vw, calc(85vh * ${ratio}))`,
+      height: `min(85vh, calc(90vw / ${ratio}))`,
+      marginLeft: 'auto',
+      marginRight: 'auto',
     }
   }
 })

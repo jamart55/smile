@@ -7,90 +7,32 @@
  * Shows an upload progress animation before displaying the final thanks message.
  */
 
-// External library imports
 import Clipboard from 'clipboard'
-
-// Vue imports
-import { onMounted, ref } from 'vue'
-
-// Internal imports
+import { onMounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 import appconfig from '@/core/config'
 import { Button } from '@/uikit/components/ui/button'
 import { Input } from '@/uikit/components/ui/input'
-import { Progress } from '@/uikit/components/ui/progress'
 import { TitleTwoCol } from '@/uikit/layouts'
 
-/**
- * Upload progress state
- */
-const isUploading = ref(true)
-const uploadProgress = ref(0)
-
-/**
- * Initialize API
- */
 const api = useAPI()
-
-/**
- * Generate completion code and set it in the API
- */
 const completionCode = api.computeCompletionCode()
 api.setCompletionCode(completionCode)
 
-/**
- * Initialize clipboard functionality and run upload animation
- * Sets up clipboard.js to handle copy-to-clipboard actions
- * Animates the progress bar over 15 seconds before showing thanks content
- */
 onMounted(() => {
-  // Set up clipboard functionality
   const clipboard = new Clipboard('[data-clipboard-target]')
   clipboard.on('success', (e) => {
     api.log.debug(`code copied to clipboard ${e.trigger.id}`)
   })
 
-  // Delay saveData by 4 seconds to avoid minWriteInterval rate limit
   setTimeout(() => {
-    api.saveData(true) // force a data save
+    api.saveData(true)
   }, 4000)
-
-  // Animate progress bar from 0 to 100 over 20 seconds
-  const duration = 20000 // 20 seconds
-  const startTime = Date.now()
-
-  const updateProgress = () => {
-    const elapsed = Date.now() - startTime
-    const progress = Math.min(elapsed / duration, 1)
-    // Ease-out curve: 1 - (1 - t)^2
-    const eased = 1 - Math.pow(1 - progress, 2)
-    uploadProgress.value = Math.round(eased * 100)
-
-    if (progress < 1) {
-      requestAnimationFrame(updateProgress)
-    } else {
-      // Hide upload screen and show thanks content
-      isUploading.value = false
-    }
-  }
-
-  requestAnimationFrame(updateProgress)
 })
 </script>
 
 <template>
-  <!-- Upload progress screen -->
-  <div v-if="isUploading" class="w-full h-screen flex flex-col items-center mt-30">
-    <div class="w-4/5 max-w-md text-center">
-      <h1 class="text-3xl font-bold mb-4">Uploading Your Data</h1>
-      <p class="text-lg text-muted-foreground mb-8">Do not close your browser window yet!</p>
-      <Progress :model-value="uploadProgress" class="h-3 mb-4" />
-      <p class="text-sm text-muted-foreground">{{ uploadProgress }}%</p>
-    </div>
-  </div>
-
-  <!-- Main container with responsive padding and centering -->
-  <div v-else class="w-full mx-auto py-10">
+  <div class="w-full mx-auto py-10">
     <div class="w-4/5 mx-auto text-left">
       <!-- Prolific recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'prolific'">

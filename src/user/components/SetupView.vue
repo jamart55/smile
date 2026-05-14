@@ -1,20 +1,17 @@
 <script setup>
-/**
- * SetupView — Plays 3 setup/calibration videos in sequence.
- * Each auto-advances after ending.
- */
 import { ref, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
 import { ConstrainedTaskWindow } from '@/uikit/layouts'
 
 const api = useViewAPI()
 
 const videoEl = ref(null)
+const videoEnded = ref(false)
 
 api.steps.append([
   { id: 'setup-01', src: 'videos/setup/01_setup-vid.mp4' },
   { id: 'setup-02', src: 'videos/setup/02_setup-vid.mp4' },
-  { id: 'setup-03', src: 'videos/setup/03_setup-vid.mp4' },
 ])
 
 function playVideo() {
@@ -25,7 +22,7 @@ function playVideo() {
 
 function onVideoEnded() {
   if (api.isLastStep()) {
-    api.goNextView()
+    videoEnded.value = true
   } else {
     api.goNextStep()
     nextTick(() => playVideo())
@@ -40,16 +37,23 @@ function onVideoEnded() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex items-center justify-center h-full bg-black">
-      <video
-        ref="videoEl"
-        :key="api.stepData.id"
-        :src="api.getPublicUrl(api.stepData.src)"
-        class="max-w-full max-h-full"
-        @ended="onVideoEnded"
-        @canplay="playVideo"
-        playsinline
-      />
+    <div class="flex flex-col h-full">
+      <div class="flex-1 min-h-0 flex items-center justify-center">
+        <video
+          ref="videoEl"
+          :key="api.stepData.id"
+          :src="api.getPublicUrl(api.stepData.src)"
+          class="max-w-full max-h-full"
+          @ended="onVideoEnded"
+          @canplay="playVideo"
+          playsinline
+        />
+      </div>
+      <div class="flex justify-center py-3 flex-shrink-0" style="min-height: 52px;">
+        <Button v-if="videoEnded" variant="default" size="lg" @click="api.goNextView()">
+          Continue
+        </Button>
+      </div>
     </div>
   </ConstrainedTaskWindow>
 </template>

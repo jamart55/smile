@@ -107,7 +107,7 @@ function finish() {
           </label>
           <p class="text-sm text-muted-foreground mb-3">Please sign below to confirm your consent.</p>
           <div class="border border-border rounded-md bg-background p-1">
-            <VueSignaturePad ref="signaturePad" width="100%" height="150px" :options="{ penColor: '#000' }" />
+            <VueSignaturePad ref="signaturePad" width="100%" height="90px" :options="{ penColor: '#000' }" />
           </div>
           <div class="flex gap-2 mt-2">
             <Button variant="outline" size="sm" @click="clearSignature">Clear</Button>
@@ -122,7 +122,7 @@ function finish() {
             How did you find out about this study?
             <span class="font-normal text-muted-foreground">(check all that apply)</span>
           </label>
-          <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-x-6 gap-y-2">
             <div class="flex items-center gap-2"><Checkbox v-model:checked="api.persist.parentForm.howFoundUs.facebookAd" id="pfFbAd" /><Label for="pfFbAd">Facebook Ad</Label></div>
             <div class="flex items-center gap-2"><Checkbox v-model:checked="api.persist.parentForm.howFoundUs.facebookPost" id="pfFbPost" /><Label for="pfFbPost">Facebook Post</Label></div>
             <div class="flex items-center gap-2"><Checkbox v-model:checked="api.persist.parentForm.howFoundUs.twitter" id="pfTw" /><Label for="pfTw">Twitter</Label></div>
