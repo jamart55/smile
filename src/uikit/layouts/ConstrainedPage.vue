@@ -50,7 +50,7 @@ const containerStyle = computed(() => {
 </script>
 
 <template>
-  <div class="flex justify-center">
+  <div class="min-h-screen flex items-center justify-center">
     <div :class="containerClasses" :style="containerStyle">
       <slot />
     </div>
