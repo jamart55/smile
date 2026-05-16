@@ -37,13 +37,13 @@ function onVideoEnded() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full w-full">
       <div class="flex-1 min-h-0 flex items-center justify-center">
         <video
           ref="videoEl"
           :key="api.stepData.id"
           :src="api.getPublicUrl(api.stepData.src)"
-          class="max-w-full max-h-full"
+          class="max-w-full max-h-full object-contain"
           @ended="onVideoEnded"
           @canplay="playVideo"
           playsinline

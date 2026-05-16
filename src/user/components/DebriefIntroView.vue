@@ -20,7 +20,7 @@ function playVideo() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full w-full">
       <div class="flex-1 min-h-0 flex items-center justify-center">
         <video
           ref="videoEl"

@@ -84,7 +84,7 @@ function saveSignature() {
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full w-full">
       <!-- Video steps -->
       <template v-if="api.stepData.type === 'video'">
         <div class="flex-1 min-h-0 flex items-center justify-center">
