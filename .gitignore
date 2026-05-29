@@ -37,6 +37,7 @@ env/*.zip
 *.service-account*
 components.d.ts
 /.vite
+.firebaserc*
 
 # Python
 analysis/.venv/
