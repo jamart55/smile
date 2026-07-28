@@ -22,6 +22,18 @@ async function startTrials() {
   } catch (e) {
     console.warn('Fullscreen request failed:', e)
   }
+
+  // Capture screen dimensions for per-participant AOI letterbox correction in analysis.
+  api.recordPageData({
+    recording_start_ts: api.persist.recording_start_ts,
+    screen_width: window.screen.width,
+    screen_height: window.screen.height,
+    inner_width: window.innerWidth,
+    inner_height: window.innerHeight,
+    device_pixel_ratio: window.devicePixelRatio,
+  })
+  api.saveData(true)
+
   api.goNextView()
 }
 </script>
