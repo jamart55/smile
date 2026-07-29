@@ -8,9 +8,10 @@
  *   - trial_start_ts / trial_end_ts / trial_duration_ms
  *   - attention_start_ts / attention_end_ts / attention_duration_ms
  *
- * Also records view-level trials_block_start_ts / trials_block_end_ts.
+ * Also records view-level trials_block_start_ts / trials_block_end_ts, and
+ * fullscreen_events (timestamped enter/exit) for detecting non-fullscreen sessions.
  */
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { useFullscreen } from '@vueuse/core'
 import useViewAPI from '@/core/composables/useViewAPI'
 
@@ -19,6 +20,20 @@ const { exit: exitFullscreen } = useFullscreen()
 
 const videoEl = ref(null)
 const phase = ref('trial') // 'trial' | 'attention'
+
+// Track fullscreen exits (e.g. Esc mid-trial) — analysis uses this to flag
+// sessions where the video wasn't actually filling the screen for AOI math.
+if (!api.persist.isDefined('fullscreen_events')) {
+  api.persist.fullscreen_events = []
+}
+function onFullscreenChange() {
+  api.persist.fullscreen_events.push({
+    ts: Date.now(),
+    fullscreen: document.fullscreenElement != null,
+  })
+}
+onMounted(() => document.addEventListener('fullscreenchange', onFullscreenChange))
+onUnmounted(() => document.removeEventListener('fullscreenchange', onFullscreenChange))
 
 api.steps.append([
   { id: '01', name: 'ul-quad-car', trial: 'videos/trials/01_ul-quad-car.mp4', attention: 'videos/trials/01_attention.mp4' },
@@ -94,7 +109,7 @@ function onVideoEnded() {
       ref="videoEl"
       :key="api.stepData.id + '-' + phase"
       :src="currentVideoSrc()"
-      class="max-w-full max-h-full"
+      class="w-full h-full object-contain"
       @play="onVideoPlay"
       @ended="onVideoEnded"
       @canplay="playVideo"
