@@ -71,7 +71,7 @@ function finish() {
             :disabled="phase !== 'choose'"
             @click="phase === 'choose' && selectAnimal(animal)"
           >
-            <span class="text-8xl mb-1">{{ animal.emoji }}</span>
+            <span class="text-6xl leading-none mb-1">{{ animal.emoji }}</span>
             <span class="text-base font-semibold">{{ animal.label }}</span>
           </button>
         </div>

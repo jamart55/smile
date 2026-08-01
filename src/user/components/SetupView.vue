@@ -15,10 +15,12 @@ api.steps.append([
 ])
 
 const TRIAL_VIDEOS = [
+  'videos/trials/100_quad_calibration_beep.mp4',
   'videos/trials/01_ul-quad-car.mp4',   'videos/trials/01_attention.mp4',
   'videos/trials/02_bl-quad-cup.mp4',   'videos/trials/02_attention.mp4',
   'videos/trials/03_br-quad-train.mp4', 'videos/trials/03_attention.mp4',
   'videos/trials/04_ul-quad-apple.mp4', 'videos/trials/04_attention.mp4',
+  'videos/trials/101_diamond_calibration.mp4',
   'videos/trials/05_up-diam-car.mp4',   'videos/trials/05_attention.mp4',
   'videos/trials/06_down-diam-dog.mp4', 'videos/trials/06_attention.mp4',
   'videos/trials/07_r-lr-shoes.mp4',    'videos/trials/07_attention.mp4',
