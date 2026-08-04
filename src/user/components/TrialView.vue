@@ -76,6 +76,24 @@ function onVideoPlay() {
   }
 }
 
+// A video that fails to load fires neither 'canplay' nor 'ended', so without this the view
+// sits on a white screen forever with no console output and the session is lost -- the exact
+// symptom of the HEVC calibration videos Chrome could not decode.
+if (!api.persist.isDefined('video_errors')) {
+  api.persist.video_errors = []
+}
+function onVideoError() {
+  const err = videoEl.value?.error
+  const msg = `${currentVideoSrc()} — code=${err?.code} ${err?.message ?? ''}`
+  console.error('[TrialView] video failed:', msg)
+  api.persist.video_errors.push({ ts: Date.now(), step: api.stepData.id, phase: phase.value, msg })
+  api.stepData[phase.value === 'trial' ? 'trial_error' : 'attention_error'] = msg
+  // Both phases record exactly once here: onVideoEnded's recordStep is never reached on the
+  // path that errored, so this does not double-record the step.
+  api.recordStep()
+  advanceAfterStep()
+}
+
 function advanceAfterStep() {
   if (api.isLastStep()) {
     // Record block-level end timestamp
@@ -126,6 +144,7 @@ function onVideoEnded() {
       @play="onVideoPlay"
       @ended="onVideoEnded"
       @canplay="playVideo"
+      @error="onVideoError"
       playsinline
     />
   </div>
