@@ -53,3 +53,10 @@ analysis/htmlcov/
 analysis/.coverage
 .pytest_cache/
 analysis/notebooks/__marimo__/session
+
+# Local AI-assistant notes — keep out of the public lab repo.
+# Bare CLAUDE.md matches at any depth. Upstream's own analysis/CLAUDE.md and
+# src/user/CLAUDE.md are already tracked, so this does not affect them; ignore
+# rules never apply to files git already tracks.
+.claude/
+CLAUDE.md
