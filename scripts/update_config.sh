@@ -3,7 +3,7 @@
 
 url=$(git config --get remote.origin.url)
 
-repo_path=$(echo "$url" | sed -E 's|.*/([^/]+)/([^/.]+)(\.git)?|\1/\2|')
+repo_path=$(echo "$url" | sed -E 's|.*[/:]([^/:]+)/([^/.]+)(\.git)?$|\1/\2|')
 
 
 # update the app configs using a base64 encoding of 
