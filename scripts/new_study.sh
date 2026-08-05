@@ -1,23 +1,27 @@
 #!/bin/bash
 # Provision a new lab study repo end to end, with its own DreamHost deploy key.
 #
-# Usage: npm run new_study -- [--dry-run] <study-name> <github-username>
+# Usage: npm run new_study -- [--dry-run] <study-name> <github-username> [description]
 #
 # Run from the root of a nyucdsc/smile checkout that has env/.env.local and
 # env/.env.deploy.local populated (the lab's shared Firebase + deploy config).
 # See docs/labconfig.md for what those files contain.
+#
+# BASE_REPO env var overrides the template repo (default nyucdsc/smile), for
+# a different lab base.
 
 set -euo pipefail
 
 ORG=nyucdsc
-BASE_REPO=nyucdsc/smile
+BASE_REPO="${BASE_REPO:-nyucdsc/smile}"
 
 DRY_RUN=false
 STUDY=""
 GH_USER=""
+DESCRIPTION=""
 
 usage() {
-  echo "Usage: npm run new_study -- [--dry-run] <study-name> <github-username>" >&2
+  echo "Usage: npm run new_study -- [--dry-run] <study-name> <github-username> [description]" >&2
   exit 1
 }
 
@@ -34,6 +38,8 @@ for arg in "$@"; do
         STUDY="$arg"
       elif [ -z "$GH_USER" ]; then
         GH_USER="$arg"
+      elif [ -z "$DESCRIPTION" ]; then
+        DESCRIPTION="$arg"
       else
         usage
       fi
@@ -142,11 +148,11 @@ else
   fi
 fi
 
-echo "==> Forking $BASE_REPO -> $STUDY_REPO"
-maybe_run gh repo fork "$BASE_REPO" --org "$ORG" --fork-name "$STUDY" --default-branch-only --clone=false
+echo "==> Creating $STUDY_REPO from template $BASE_REPO"
+maybe_run gh repo create "$STUDY_REPO" --private --template "$BASE_REPO"
 
-# Fork creation is async on GitHub's side; hitting repos/$STUDY_REPO right
-# after the fork call can 404 before it's materialized. Poll rather than
+# Repo creation is async on GitHub's side; hitting repos/$STUDY_REPO right
+# after the create call can 404 before it's materialized. Poll rather than
 # risk steps 6-8 failing after the pubkey is already live on the server.
 echo "==> Waiting for $STUDY_REPO to become available"
 if $DRY_RUN; then
@@ -161,13 +167,27 @@ else
     sleep 2
   done
   if ! $found; then
-    echo "error: $STUDY_REPO did not become available after forking (30s). The pubkey is already installed on $EXP_DEPLOY_HOST — check GitHub manually, then re-run once the fork shows up." >&2
+    echo "error: $STUDY_REPO did not become available after creation (30s). The pubkey is already installed on $EXP_DEPLOY_HOST — check GitHub manually, then re-run once the repo shows up." >&2
     exit 1
   fi
 fi
 
-echo "==> Enabling Actions on $STUDY_REPO"
-maybe_run gh api -X PUT "repos/$STUDY_REPO/actions/permissions" -F enabled=true -f allowed_actions=all >/dev/null
+if [ -n "$DESCRIPTION" ]; then
+  echo "==> Setting description on $STUDY_REPO"
+  maybe_run gh repo edit "$STUDY_REPO" --description "$DESCRIPTION"
+fi
+
+# Actions being disabled by default only applies to forks (docs/labconfig.md
+# "Enable Actions on your new template repository"). A --template copy is a
+# normal repo, so Actions should already be on; this call is expected to be a
+# harmless no-op here, kept as a belt-and-suspenders in case that ever changes.
+# Non-fatal: an org-level Actions policy could make this 422 even though the
+# repo (and pubkey, and collaborator/secrets still to come) are already live —
+# warn and keep going rather than abort a half-provisioned run over an
+# optional step.
+echo "==> Ensuring Actions are enabled on $STUDY_REPO"
+maybe_run gh api -X PUT "repos/$STUDY_REPO/actions/permissions" -F enabled=true -f allowed_actions=all >/dev/null \
+  || echo "[warn] could not set Actions permissions on $STUDY_REPO — check the repo's Actions tab manually" >&2
 
 echo "==> Adding $GH_USER as admin collaborator"
 maybe_run gh api -X PUT "repos/$STUDY_REPO/collaborators/$GH_USER" -f permission=admin >/dev/null
