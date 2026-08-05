@@ -7,7 +7,11 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD | tr '[:upper:]' '[:lower:]')
 echo "Forcing a deploy of branch: $BRANCH." 
 echo "Warning: this will only work if you have run 'npm run upload_config' at least once"
 
-gh workflow run deploy.yml -f github_sha=$BRANCH
+# --ref matters as much as github_sha: deploy.yml takes its checkout from the input but
+# VITE_GIT_BRANCH_NAME and the codename from GITHUB_REF_SLUG, which follows --ref. Without
+# it gh dispatches on the default branch, so $BRANCH's code deploys under main's base path,
+# main's codename, and main's Firestore projectRef.
+gh workflow run deploy.yml --ref $BRANCH -f github_sha=$BRANCH
 
 # the old way of doing this required a forced commit
 # like the new way better
