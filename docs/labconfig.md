@@ -459,6 +459,78 @@ npm run upload_config
 
 Then be sure to redistribute the changed files to members of your lab.
 
+## Provisioning a new study repo
+
+Once your lab's base repo is set up as above, creating a new per-study repo
+(the `nyucdsc/<study-name>` layer in the diagram above) used to be a manual
+fork, a manual collaborator add, a manual `authorized_keys` append,
+and a manual `npm run upload_config` — all sharing one DreamHost deploy key
+across every study in the lab. `scripts/new_study.sh` does the whole thing in
+one command, and gives the new study its **own** deploy key so a leak or a
+rotation only affects that one study.
+
+From a clone of the lab's base repo, with `env/.env.local` and
+`env/.env.deploy.local` populated (see above):
+
+```
+npm run new_study -- <study-name> <github-username> [description]
+```
+
+This generates a new ed25519 key, installs its public half on the deploy
+server, verifies it authenticates, creates `nyucdsc/<study-name>` as a
+**private** repo from the `nyucdsc/smile` template (`gh repo create --private
+--template`, following the sequence in [Starting a new
+project](/starting)), optionally sets its description, confirms GitHub
+Actions are enabled, adds `<github-username>` as an admin collaborator, and
+uploads all the GitHub secrets the deploy workflow needs — including the new
+study's own `EXP_DEPLOY_KEY`, piped in over stdin so it never touches a file,
+argv, or shell history. Existing lab repos created by the old fork flow are
+public; repos `new_study.sh` creates going forward are private — only
+`<github-username>` (added as admin collaborator) can clone it until someone
+else is invited too.
+
+The template repo defaults to `nyucdsc/smile` and can be overridden with the
+`BASE_REPO` environment variable, e.g. `BASE_REPO=nyucdsc/other-base npm run
+new_study -- ...`, for a lab with a different base.
+
+Add `--dry-run` to print every `gh`/`ssh` command it would run without
+running any of them — useful for checking the study name, template target,
+and codename before committing to a real run.
+
+**Known limitation: no shared history with the template.** `gh repo create
+--template` starts the new repo with a fresh, unrelated git history — it is
+not a GitHub fork, has no parent link, and shares no commits with
+`nyucdsc/smile`. Pulling later framework updates from `nyucdsc/smile` into an
+existing study is therefore not a routine `git merge upstream/main`; it
+needs `git merge --allow-unrelated-histories` and should be expected to
+conflict broadly. This is a known consequence of following the documented
+template flow, not something this script works around.
+
+The script only provisions the remote side. The study owner still clones
+their new repo and runs `npm run setup_project` themselves (see
+[Starting a new project](/starting)) to install dependencies locally.
+
+**What the new study's owner needs to request from the lab vault** (see
+"Configure your base repo" above for what these files look like): just two
+files, `env/.env.local` and `env/.env.deploy.local`. They do **not** need
+the deploy key — their copy of `.env.deploy.local` will have no
+`EXP_DEPLOY_KEY` line at all. That's by design, not a mistake: this study's
+key lives only as a GitHub secret on `nyucdsc/<study-name>` and on the lab
+manager's machine. If the owner later runs `npm run upload_config`
+themselves (e.g., after editing their Firebase config), `gh secret set -f`
+only sets variables present in the file, so the missing `EXP_DEPLOY_KEY`
+line leaves the existing secret untouched.
+
+### Revoking a study's key
+
+```
+npm run revoke_study_key -- <study-name>
+```
+
+Strips that study's key out of `authorized_keys` on the deploy server and
+deletes its `EXP_DEPLOY_KEY` GitHub secret. Every other study's key keeps
+working. Also supports `--dry-run`.
+
 ## Other things to configure in your base repo
 
 A few files you might want to modify in your base repo are:
