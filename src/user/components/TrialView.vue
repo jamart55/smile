@@ -36,17 +36,39 @@ function onFullscreenChange() {
 onMounted(() => document.addEventListener('fullscreenchange', onFullscreenChange))
 onUnmounted(() => document.removeEventListener('fullscreenchange', onFullscreenChange))
 
+// pilot-02: single layout (quad or diam) per participant, randomly assigned in
+// design.js. Each condition has its own 8 trial videos (filenames carry
+// object + target AOI) and reuses 3 AG clips across the 8 slots — one AG
+// appears twice, matching the AG that's duplicated inside that condition's
+// calibration video (quad: inversion, diam: rainbow).
+const TRIAL_FILES = {
+  quad: ['01_car_UL', '02_apple_UR', '03_train_BR', '04_dog_UL', '05_cup_BL', '06_car_UR', '07_bike_BL', '08_shoes_BR'],
+  diam: ['01_car_B', '02_apple_T', '03_car_R', '04_bottle_B', '05_dog_L', '06_train_T', '07_bike_L', '08_shoes_R'],
+}
+const AG_ORDER = {
+  quad: ['rainbow', 'blob', 'inversion', 'rainbow', 'blob', 'inversion', 'rainbow', 'blob'],
+  diam: ['inversion', 'blob', 'rainbow', 'inversion', 'blob', 'rainbow', 'inversion', 'blob'],
+}
+
+const layout = api.getConditionByName('layout')
+
 api.steps.append([
-  { id: '100', kind: 'calib', layout: 'quadrant',  name: 'quad-calib',  trial: 'videos/trials/100_quad_calibration_beep.mp4', attention: null },
-  { id: '01', kind: 'trial', layout: 'quadrant', name: 'ul-quad-car', trial: 'videos/trials/01_ul-quad-car.mp4', attention: 'videos/trials/01_attention.mp4' },
-  { id: '02', kind: 'trial', layout: 'quadrant', name: 'bl-quad-cup', trial: 'videos/trials/02_bl-quad-cup.mp4', attention: 'videos/trials/02_attention.mp4' },
-  { id: '03', kind: 'trial', layout: 'quadrant', name: 'br-quad-train', trial: 'videos/trials/03_br-quad-train.mp4', attention: 'videos/trials/03_attention.mp4' },
-  { id: '04', kind: 'trial', layout: 'quadrant', name: 'ul-quad-apple', trial: 'videos/trials/04_ul-quad-apple.mp4', attention: 'videos/trials/04_attention.mp4' },
-  { id: '101', kind: 'calib', layout: 'diamond',   name: 'diam-calib',  trial: 'videos/trials/101_diamond_calibration.mp4', attention: null },
-  { id: '05', kind: 'trial', layout: 'diamond', name: 'up-diam-car', trial: 'videos/trials/05_up-diam-car.mp4', attention: 'videos/trials/05_attention.mp4' },
-  { id: '06', kind: 'trial', layout: 'diamond', name: 'down-diam-dog', trial: 'videos/trials/06_down-diam-dog.mp4', attention: 'videos/trials/06_attention.mp4' },
-  { id: '07', kind: 'trial', layout: 'leftright', name: 'r-lr-shoes', trial: 'videos/trials/07_r-lr-shoes.mp4', attention: 'videos/trials/07_attention.mp4' },
-  { id: '08', kind: 'trial', layout: 'leftright', name: 'l-lr-train', trial: 'videos/trials/08_l-lr-train.mp4', attention: 'videos/trials/08_attention.mp4' },
+  {
+    id: '00',
+    kind: 'calib',
+    layout,
+    name: `${layout}-calib`,
+    trial: `videos/trials/pilot02/calib/${layout}-calib.mp4`,
+    attention: null,
+  },
+  ...TRIAL_FILES[layout].map((file, i) => ({
+    id: file.slice(0, 2),
+    kind: 'trial',
+    layout,
+    name: file,
+    trial: `videos/trials/pilot02/${layout}/${file}.mp4`,
+    attention: `videos/trials/pilot02/ag/${AG_ORDER[layout][i]}.mp4`,
+  })),
 ])
 
 // Record block-level start timestamp

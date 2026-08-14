@@ -31,6 +31,10 @@ const api = useAPI()
 import Timeline from '@/core/timeline/Timeline'
 const timeline = new Timeline(api)
 
+// pilot-02: quad vs diam layout, assigned once per participant
+api.randomAssignCondition({ layout: ['quad', 'diam'] })
+
+
 // Runtime configuration
 api.setRuntimeConfig('allowRepeats', false)
 api.setRuntimeConfig('colorMode', 'light')
