@@ -64,14 +64,14 @@ function finish() {
           <button
             v-for="animal in animals"
             :key="animal.id"
-            class="flex flex-col items-center justify-center p-4 border-2 border-border rounded-lg transition-colors"
+            class="flex flex-col items-center justify-center p-8 border-2 border-border rounded-lg transition-colors"
             :class="phase === 'choose'
               ? 'hover:border-primary hover:bg-muted cursor-pointer'
               : 'opacity-40 cursor-not-allowed'"
             :disabled="phase !== 'choose'"
             @click="phase === 'choose' && selectAnimal(animal)"
           >
-            <span class="text-6xl leading-none mb-1">{{ animal.emoji }}</span>
+            <span class="text-7xl leading-normal mb-1">{{ animal.emoji }}</span>
             <span class="text-base font-semibold">{{ animal.label }}</span>
           </button>
         </div>
