@@ -50,7 +50,15 @@ const AG_ORDER = {
   diam: ['inversion', 'blob', 'rainbow', 'inversion', 'blob', 'rainbow', 'inversion', 'blob'],
 }
 
-const layout = api.getConditionByName('layout')
+let layout = api.getConditionByName('layout')
+if (!layout) {
+  // Should be assigned in design.js at welcome; falling back so a session
+  // isn't lost to a white screen (TRIAL_FILES[undefined].map() would throw).
+  console.error('[TrialView] layout condition missing, defaulting to quad')
+  if (!api.persist.isDefined('video_errors')) api.persist.video_errors = []
+  api.persist.video_errors.push({ ts: Date.now(), step: 'init', phase: 'layout', msg: 'layout condition undefined' })
+  layout = 'quad'
+}
 
 api.steps.append([
   {

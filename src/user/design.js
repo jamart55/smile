@@ -31,10 +31,6 @@ const api = useAPI()
 import Timeline from '@/core/timeline/Timeline'
 const timeline = new Timeline(api)
 
-// pilot-02: quad vs diam layout, assigned once per participant
-api.randomAssignCondition({ layout: ['quad', 'diam'] })
-
-
 // Runtime configuration
 api.setRuntimeConfig('allowRepeats', false)
 api.setRuntimeConfig('colorMode', 'light')
@@ -63,6 +59,8 @@ timeline.pushSeqView({
   },
   beforeEnter: () => {
     api.getBrowserFingerprint()
+    // pilot-02: quad vs diam layout, assigned once per participant
+    api.randomAssignCondition({ layout: ['quad', 'diam'] })
   },
 })
 
@@ -81,6 +79,8 @@ timeline.pushSeqView({
     if (initService(to.params.service) === false) return false
     processQuery(to.query, to.params.service)
     api.getBrowserFingerprint()
+    // after initService()'s localStorage wipe (PANDA sibling/retry handling); see utils.js
+    api.randomAssignCondition({ layout: ['quad', 'diam'] })
   },
 })
 

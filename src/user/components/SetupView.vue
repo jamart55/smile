@@ -14,17 +14,29 @@ api.steps.append([
   { id: 'setup-02', src: 'videos/setup/02_setup-vid.mp4' },
 ])
 
+// pilot-02: condition isn't known yet at setup time, so preload both layouts' videos.
 const TRIAL_VIDEOS = [
-  'videos/trials/100_quad_calibration_beep.mp4',
-  'videos/trials/01_ul-quad-car.mp4',   'videos/trials/01_attention.mp4',
-  'videos/trials/02_bl-quad-cup.mp4',   'videos/trials/02_attention.mp4',
-  'videos/trials/03_br-quad-train.mp4', 'videos/trials/03_attention.mp4',
-  'videos/trials/04_ul-quad-apple.mp4', 'videos/trials/04_attention.mp4',
-  'videos/trials/101_diamond_calibration.mp4',
-  'videos/trials/05_up-diam-car.mp4',   'videos/trials/05_attention.mp4',
-  'videos/trials/06_down-diam-dog.mp4', 'videos/trials/06_attention.mp4',
-  'videos/trials/07_r-lr-shoes.mp4',    'videos/trials/07_attention.mp4',
-  'videos/trials/08_l-lr-train.mp4',    'videos/trials/08_attention.mp4',
+  'videos/trials/pilot02/calib/quad-calib.mp4',
+  'videos/trials/pilot02/calib/diam-calib.mp4',
+  'videos/trials/pilot02/quad/01_car_UL.mp4',
+  'videos/trials/pilot02/quad/02_apple_UR.mp4',
+  'videos/trials/pilot02/quad/03_train_BR.mp4',
+  'videos/trials/pilot02/quad/04_dog_UL.mp4',
+  'videos/trials/pilot02/quad/05_cup_BL.mp4',
+  'videos/trials/pilot02/quad/06_car_UR.mp4',
+  'videos/trials/pilot02/quad/07_bike_BL.mp4',
+  'videos/trials/pilot02/quad/08_shoes_BR.mp4',
+  'videos/trials/pilot02/diam/01_car_B.mp4',
+  'videos/trials/pilot02/diam/02_apple_T.mp4',
+  'videos/trials/pilot02/diam/03_car_R.mp4',
+  'videos/trials/pilot02/diam/04_bottle_B.mp4',
+  'videos/trials/pilot02/diam/05_dog_L.mp4',
+  'videos/trials/pilot02/diam/06_train_T.mp4',
+  'videos/trials/pilot02/diam/07_bike_L.mp4',
+  'videos/trials/pilot02/diam/08_shoes_R.mp4',
+  'videos/trials/pilot02/ag/rainbow.mp4',
+  'videos/trials/pilot02/ag/inversion.mp4',
+  'videos/trials/pilot02/ag/blob.mp4',
 ]
 
 // Hold refs so GC doesn't collect before videos finish buffering
