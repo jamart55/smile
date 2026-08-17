@@ -234,6 +234,7 @@ export default defineStore('smilestore', {
   state: () => ({
     browserPersisted: useStorage(appconfig.localStorageKey, initBrowserPersisted, localStorage, {
       mergeDefaults: true,
+      writeDefaults: false,
     }),
     browserEphemeral: initBrowserEphemeral,
     dev:
