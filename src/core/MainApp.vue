@@ -258,7 +258,7 @@ const deviceTooSmall = computed(() => {
 <template>
   <div
     id="main-app"
-    class="@container bg-background text-foreground"
+    class="@container bg-background text-foreground min-h-screen flex flex-col items-center justify-center"
     :data-experiment-scope="api.config.mode !== 'presentation' ? '' : null"
     ref="containerDiv"
   >
