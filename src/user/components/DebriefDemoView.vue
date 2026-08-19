@@ -12,7 +12,6 @@ if (!api.persist.isDefined('debriefDemo')) {
   api.persist.debriefDemo = reactive({
     childDob: '',
     childGender: '',
-    childGenderOther: '',
     childLanguage: '',
     childLanguageOther: '',
     childRace: '',
@@ -50,10 +49,10 @@ function finish() {
           <p v-if="dobError" class="text-sm text-red-500 mt-1">Please use MM/DD/YYYY format.</p>
         </div>
 
-        <!-- Gender -->
+        <!-- Sex -->
         <div>
           <label class="block text-md font-semibold mb-2">
-            Child's gender identity <span class="text-red-500">*</span>
+            Child's sex assigned at birth <span class="text-red-500">*</span>
           </label>
           <Select v-model="form.childGender">
             <SelectTrigger class="w-full bg-background text-base">
@@ -63,15 +62,8 @@ function finish() {
               <SelectItem value="male">Male</SelectItem>
               <SelectItem value="female">Female</SelectItem>
               <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
-          <Input
-            v-if="form.childGender === 'other'"
-            v-model="form.childGenderOther"
-            placeholder="Please specify"
-            class="mt-2 bg-background text-base"
-          />
         </div>
 
         <!-- Language -->

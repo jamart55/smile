@@ -37,6 +37,7 @@ if (!api.persist.isDefined('parentForm')) {
 }
 
 const signaturePad = ref(null)
+const showValidationError = ref(false)
 
 const complete = computed(() => {
   return api.persist.parentForm.videoConsent !== '' && api.persist.parentForm.signature !== null
@@ -68,7 +69,10 @@ function autofill() {
 api.setAutofill(autofill)
 
 function finish() {
-  saveSignature()
+  if (!complete.value) {
+    showValidationError.value = true
+    return
+  }
   api.recordPageData(api.persist.parentForm)
   api.saveData(true)
   api.goNextView()
@@ -93,11 +97,18 @@ function finish() {
             <SelectTrigger class="w-full bg-background text-base">
               <SelectValue placeholder="Select a privacy option" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="panda">PANDA only — video used for research purposes only</SelectItem>
-              <SelectItem value="public">Public — video may be used in presentations or publications</SelectItem>
+            <SelectContent class="w-[var(--reka-select-trigger-width)] max-w-[var(--reka-select-trigger-width)]">
+              <SelectItem value="panda" class="whitespace-normal">
+                I prefer for my video to remain accessible only to PANDA researchers and never shared with other researchers.
+              </SelectItem>
+              <SelectItem value="public" class="whitespace-normal">
+                I give permission to show video excerpts and images from recordings of this session for scientific presentations and informational/educational purposes, but never for commercial purposes.
+              </SelectItem>
             </SelectContent>
           </Select>
+          <p v-if="showValidationError && !api.persist.parentForm.videoConsent" class="text-xs text-red-500 mt-1">
+            Please select a privacy option.
+          </p>
         </div>
 
         <!-- Digital Signature -->
@@ -114,6 +125,9 @@ function finish() {
             <Button variant="outline" size="sm" @click="saveSignature">Save Signature</Button>
           </div>
           <p v-if="api.persist.parentForm.signature" class="text-xs text-green-600 mt-1">Signature saved</p>
+          <p v-else-if="showValidationError" class="text-xs text-red-500 mt-1">
+            Please sign above and click "Save Signature" before continuing.
+          </p>
         </div>
 
         <!-- How Did You Find Us -->
@@ -160,7 +174,7 @@ function finish() {
 
         <hr class="border-border my-6" />
         <div class="flex justify-end">
-          <Button variant="default" :disabled="!complete" @click="finish()">Submit and Continue</Button>
+          <Button variant="default" @click="finish()">Submit and Continue</Button>
         </div>
       </div>
     </div>
