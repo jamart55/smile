@@ -1,0 +1,63 @@
+{
+  "_comment": "Known screen positions the pilot-02 calibration clips dwell at, one per layout. Positions in fractional coords of the 1920x1080 trial frame (video-frac, same space as aoi_layouts.json). Derived by centroid tracking of smile/public/videos/trials/pilot02/calib/*.mp4 (tools/extract_calib_dwells.py) and visually confirmed at each dwell's midpoint frame via data/qa/calib_dwells_contact_sheet.png. t_start/t_end are seconds from that clip's own start.",
+  "trials": {
+    "quad-calib": {
+      "layout": "quad",
+      "dwells": [
+        {
+          "t_start": 6.033,
+          "t_end": 10.033,
+          "cx": 0.0829,
+          "cy": 0.1574
+        },
+        {
+          "t_start": 11.033,
+          "t_end": 15.033,
+          "cx": 0.9191,
+          "cy": 0.8708
+        },
+        {
+          "t_start": 16.033,
+          "t_end": 20.033,
+          "cx": 0.0864,
+          "cy": 0.8459
+        },
+        {
+          "t_start": 21.033,
+          "t_end": 25.033,
+          "cx": 0.9191,
+          "cy": 0.1624
+        }
+      ]
+    },
+    "diam-calib": {
+      "layout": "diam",
+      "dwells": [
+        {
+          "t_start": 7.533,
+          "t_end": 11.533,
+          "cx": 0.4969,
+          "cy": 0.1574
+        },
+        {
+          "t_start": 12.533,
+          "t_end": 16.533,
+          "cx": 0.5076,
+          "cy": 0.8616
+        },
+        {
+          "t_start": 17.533,
+          "t_end": 21.533,
+          "cx": 0.0864,
+          "cy": 0.5033
+        },
+        {
+          "t_start": 22.533,
+          "t_end": 26.533,
+          "cx": 0.9094,
+          "cy": 0.5001
+        }
+      ]
+    }
+  }
+}

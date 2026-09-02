@@ -1,0 +1,23 @@
+{
+  "_comment": "pilot-02 AOI regions, in fractional coordinates of the 1920x1080 trial video frame ('video-frac'). cx,cy = box centre; w,h = box size. Regions are fixed partitions of the frame, NOT boxes fitted to the stimulus objects: looking time is scored by which region the child looks at, whatever the object is doing at that moment. Keys are the AOI tokens used in the trial filenames (<layout>_<NN>_<object>_<AOI>.mp4), so they join directly to pilot-02-trial-timing.csv.",
+  "_provenance": "Derived and verified 2026-08-21 against the deployed trial videos in smile/public/videos/trials/pilot02/{quad,diam}/ (all 16 confirmed 1920x1080). Geometry carried over unchanged from 01_pilot/analysis/aoi_layouts.json; only the verification is new. Regenerate the check with: PYTHONPATH=lib uv run python -m dspilot.aoi_qa (from smile/analysis/).",
+  "quad": {
+    "_comment": "Four quadrants shrunk to leave an uncoded band around the midlines, so a near-midline sample falls through to OUT instead of being forced into a quadrant. IMPORTANT: dead_zone_margin is ALREADY BAKED INTO w/h (0.5 - 0.05 = 0.45). Do not apply it a second time downstream; it is recorded only to document how the boxes were built.",
+    "dead_zone_margin": 0.05,
+    "boxes": {
+      "UL": {"cx": 0.225, "cy": 0.225, "w": 0.45, "h": 0.45},
+      "UR": {"cx": 0.775, "cy": 0.225, "w": 0.45, "h": 0.45},
+      "BL": {"cx": 0.225, "cy": 0.775, "w": 0.45, "h": 0.45},
+      "BR": {"cx": 0.775, "cy": 0.775, "w": 0.45, "h": 0.45}
+    }
+  },
+  "diam": {
+    "_comment": "Middle row and middle column of a 3x3 grid. The four corners and the centre third are deliberately untagged and fall through to OUT - that is structural to the partition, not a margin, so there is no dead_zone_margin here.",
+    "boxes": {
+      "T": {"cx": 0.50000000, "cy": 0.16666667, "w": 0.33333333, "h": 0.33333333},
+      "B": {"cx": 0.50000000, "cy": 0.83333333, "w": 0.33333333, "h": 0.33333333},
+      "L": {"cx": 0.16666667, "cy": 0.50000000, "w": 0.33333333, "h": 0.33333333},
+      "R": {"cx": 0.83333333, "cy": 0.50000000, "w": 0.33333333, "h": 0.33333333}
+    }
+  }
+}
