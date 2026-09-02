@@ -29,6 +29,8 @@ dist-ssr
 /docs/.vitepress/cache
 /public/qr.svg
 /data/private/**
+/data/anonymized/**
+/analysis/data/**
 env/*.txt
 env/*.tar.gz
 env/*.zip
